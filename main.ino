@@ -1,4 +1,5 @@
 #include <LiquidCrystal.h>
+#include <DS3231.h>
 
 const int PIN_RS = 8; 
 const int PIN_EN = 9; 
@@ -11,6 +12,7 @@ const int PIN_D7 = 7;
 const int PIN_BL = 10;  // Backlight pin.
 
 LiquidCrystal lcd(PIN_RS,  PIN_EN,  PIN_D4,  PIN_D5,  PIN_D6,  PIN_D7);
+DS3231  rtc(A4, A5);
 
 // Draws the 6 character clock icon at a specified (x, y) position.
 void drawClock(int x=0, int y=0) {
@@ -20,6 +22,11 @@ void drawClock(int x=0, int y=0) {
             lcd.write(i + (j == 1 ? 3:0));  //If drawing bottom row start at 3, if not, start at 0.
         }
     }   
+}
+
+void drawTime(int x=4, int y=0) {
+    lcd.setCursor(x, y);
+    lcd.print(rtc.getTimeStr());
 }
 
 void setup() {
@@ -36,9 +43,12 @@ void setup() {
 
  pinMode(PIN_BL, OUTPUT);
  digitalWrite(PIN_BL, HIGH);
+
+ rtc.begin();
 }
 
 void loop() {
-
+    drawTime();
+    delay(1000);
 }
 
