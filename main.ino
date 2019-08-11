@@ -24,9 +24,18 @@ void drawClock(int x=0, int y=0) {
     }   
 }
 
-void drawTime(int x=4, int y=0) {
+void drawTime(int x=5, int y=0) {
     lcd.setCursor(x, y);
+    lcd.write(6);
+
+    lcd.setCursor(x+2, y);
     lcd.print(rtc.getTimeStr());
+
+    lcd.setCursor(x, y+1);
+    lcd.write(7);
+
+    lcd.setCursor(x+2, y+1);
+    lcd.print("OFF");
 }
 
 void setup() {
@@ -38,6 +47,8 @@ void setup() {
  lcd.createChar(3, CLOCK_BOTTOM_LEFT);
  lcd.createChar(4, CLOCK_BOTTOM_MIDDLE);
  lcd.createChar(5, CLOCK_BOTTOM_RIGHT);
+ lcd.createChar(6, CLOCK);
+ lcd.createChar(7, BELL);
 
  drawClock();
 
