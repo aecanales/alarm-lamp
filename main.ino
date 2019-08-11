@@ -24,13 +24,17 @@ void drawClock(int x=0, int y=0) {
     }   
 }
 
+// Draws the 1 character clock icon and the current time from the RTC module.
 void drawTime(int x=5, int y=0) {
     lcd.setCursor(x, y);
     lcd.write(6);
 
     lcd.setCursor(x+2, y);
     lcd.print(rtc.getTimeStr());
+}
 
+// Draws the 1 character bell icon and the time the alarm is currently set to.
+void drawSetAlarm(int x=5, int y=1) {
     lcd.setCursor(x, y+1);
     lcd.write(7);
 
@@ -38,28 +42,39 @@ void drawTime(int x=5, int y=0) {
     lcd.print("OFF");
 }
 
+// Draws the main menu including clock icon, current time, and alamt set time.
+void drawMenu() {
+    drawClock();
+    drawTime();
+    drawSetAlarm();
+}
+
+/* Initializes the custom LCD characters. 
+   0-6 are the clock drawing, while 6 is a clock and 7 is a bell. */
+void createCharacters() {
+    lcd.createChar(0, CLOCK_TOP_LEFT);
+    lcd.createChar(1, CLOCK_TOP_MIDDLE);
+    lcd.createChar(2, CLOCK_TOP_RIGHT);
+    lcd.createChar(3, CLOCK_BOTTOM_LEFT);
+    lcd.createChar(4, CLOCK_BOTTOM_MIDDLE);
+    lcd.createChar(5, CLOCK_BOTTOM_RIGHT);
+    lcd.createChar(6, CLOCK);
+    lcd.createChar(7, BELL);
+}
+
 void setup() {
- lcd.begin(16, 2);
- 
- lcd.createChar(0, CLOCK_TOP_LEFT);
- lcd.createChar(1, CLOCK_TOP_MIDDLE);
- lcd.createChar(2, CLOCK_TOP_RIGHT);
- lcd.createChar(3, CLOCK_BOTTOM_LEFT);
- lcd.createChar(4, CLOCK_BOTTOM_MIDDLE);
- lcd.createChar(5, CLOCK_BOTTOM_RIGHT);
- lcd.createChar(6, CLOCK);
- lcd.createChar(7, BELL);
+    lcd.begin(16, 2);
+    createCharacters();
 
- drawClock();
-
- pinMode(PIN_BL, OUTPUT);
- digitalWrite(PIN_BL, HIGH);
-
- rtc.begin();
+    // Initialize the LCD backlight to ON. 
+    pinMode(PIN_BL, OUTPUT);
+    digitalWrite(PIN_BL, HIGH); 
+    
+    rtc.begin();
 }
 
 void loop() {
-    drawTime();
+    drawMenu();
     delay(1000);
 }
 
