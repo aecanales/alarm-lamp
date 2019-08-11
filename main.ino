@@ -12,7 +12,12 @@ const int PIN_D7 = 7;
 const int PIN_BL = 10;  // Backlight pin.
 
 LiquidCrystal lcd(PIN_RS,  PIN_EN,  PIN_D4,  PIN_D5,  PIN_D6,  PIN_D7);
+
 DS3231  rtc(A4, A5);
+
+// Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
+int menuState = 0;
+
 
 // Draws the 6 character clock icon at a specified (x, y) position.
 void drawClock(int x=0, int y=0) {
@@ -49,6 +54,14 @@ void drawMenu() {
     drawSetAlarm();
 }
 
+// Draws menu where you can set the alarm.
+void drawAlarmConfiguration(int x=5, int y=0) {
+    drawClock();
+    
+    lcd.setCursor(x, y);
+    lcd.print("Set alarm:");
+}
+
 /* Initializes the custom LCD characters. 
    0-6 are the clock drawing, while 6 is a clock and 7 is a bell. */
 void createCharacters() {
@@ -60,6 +73,26 @@ void createCharacters() {
     lcd.createChar(5, CLOCK_BOTTOM_RIGHT);
     lcd.createChar(6, CLOCK);
     lcd.createChar(7, BELL);
+}
+
+// Returns an int between 0 and 5 inclusive depending on the button pressed. 
+int readButtonPress() {
+    int read;
+    read = analogRead(A0);
+
+    if      (read < 60 ) { return 1; }  // Right
+    else if (read < 200) { return 2; }  // Up
+    else if (read < 400) { return 3; }  // Down
+    else if (read < 600) { return 4; }  // Left
+    else if (read < 800) { return 5; }  // Select
+    else                 { return 0; }  // Nothing pressed
+} 
+
+// Switches to another menu.
+void switchToMenu(int newMenu = 0) {
+    lcd.clear();
+    menuState = newMenu;
+    delay(1000);  // Time to allow the user to let go of the button.
 }
 
 void setup() {
@@ -74,7 +107,15 @@ void setup() {
 }
 
 void loop() {
-    drawMenu();
-    delay(1000);
+    switch (menuState) {
+        case 0:
+            drawMenu();
+            if (readButtonPress() == 5) { switchToMenu(1); }
+            break;
+        case 1:
+            drawAlarmConfiguration();
+            if (readButtonPress() == 5) { switchToMenu(0); }
+            break;
+    }
 }
 
