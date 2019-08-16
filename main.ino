@@ -17,6 +17,7 @@ DS3231  rtc(A4, A5);
 
 // Each value (hour, minute and second) are represented by their two digits for easier input.
 int alarmTime[6];
+int currentDigit = 0;  // Digit the user is currently setting. 
 
 // Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
 int menuState = 0;
@@ -72,6 +73,8 @@ void drawAlarmConfiguration(int x=4, int y=0) {
             lcd.print(":"); 
         }
     }
+
+    lcd.setCursor(x+currentDigit, y+1);
 }
 
 /* Initializes the custom LCD characters. 
@@ -87,24 +90,42 @@ void createCharacters() {
     lcd.createChar(7, BELL);
 }
 
-// Returns an int between 0 and 5 inclusive depending on the button pressed. 
-int readButtonPress() {
+// Returns a character depending on the button pressed on the shield. 
+char readButtonPress() {
     int read;
     read = analogRead(A0);
 
-    if      (read < 60 ) { return 1; }  // Right
-    else if (read < 200) { return 2; }  // Up
-    else if (read < 400) { return 3; }  // Down
-    else if (read < 600) { return 4; }  // Left
-    else if (read < 800) { return 5; }  // Select
-    else                 { return 0; }  // Nothing pressed
+    if      (read < 60 ) { return 'r'; }  // Right
+    else if (read < 200) { return 'u'; }  // Up
+    else if (read < 400) { return 'd'; }  // Down
+    else if (read < 600) { return 'l'; }  // Left
+    else if (read < 800) { return 's'; }  // Select
+    else                 { return ' '; }  // Nothing pressed
 } 
 
 // Switches to another menu.
-void switchToMenu(int newMenu = 0) {
+void switchToMenu(int newMenu) {
     lcd.clear();
-    menuState = newMenu;
     delay(1000);  // Time to allow the user to let go of the button.
+
+    menuState = newMenu;
+    if (menuState == 1) {
+        lcd.cursor();
+        drawAlarmConfiguration();
+    } 
+    else {
+        lcd.noCursor();
+    }
+}
+
+/* Wraps a value in a given range. That is:
+*  - Return the min if the value exceeds the max 
+*  - Return the max if the value is lower than the min
+*/
+int wrapValue(int value, int min, int max) {
+    if      (value > max) { return min;   }
+    else if (value < min) { return max;   }
+    else                  { return value; }
 }
 
 void setup() {
@@ -116,19 +137,36 @@ void setup() {
     digitalWrite(PIN_BL, HIGH); 
     
     rtc.begin();
-
-    Serial.begin(9600);
 }
 
 void loop() {
     switch (menuState) {
         case 0:
             drawMenu();
-            if (readButtonPress() == 5) { switchToMenu(1); }
+            if (readButtonPress() == 's') { switchToMenu(1); }
             break;
         case 1:
-            drawAlarmConfiguration();
-            if (readButtonPress() == 5) { switchToMenu(0); }
+            switch (readButtonPress()) {
+                case 'r':
+                    currentDigit = wrapValue(currentDigit + 1, 0, 5);
+                    drawAlarmConfiguration();
+                    break;
+                case 'l':
+                    currentDigit = wrapValue(currentDigit + 1, 0, 5);
+                    drawAlarmConfiguration();
+                    break;
+                case 'u':
+                    alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, 9);
+                    drawAlarmConfiguration();
+                    break;
+                case 'd':
+                    alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, 9);
+                    drawAlarmConfiguration();
+                    break;
+                case 's':
+                    switchToMenu(1);
+                    break;
+            }
             break;
     }
 
