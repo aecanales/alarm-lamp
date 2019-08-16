@@ -15,6 +15,9 @@ LiquidCrystal lcd(PIN_RS,  PIN_EN,  PIN_D4,  PIN_D5,  PIN_D6,  PIN_D7);
 
 DS3231  rtc(A4, A5);
 
+// Each value (hour, minute and second) are represented by their two digits for easier input.
+int alarmTime[6];
+
 // Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
 int menuState = 0;
 
@@ -55,11 +58,20 @@ void drawMenu() {
 }
 
 // Draws menu where you can set the alarm.
-void drawAlarmConfiguration(int x=5, int y=0) {
+void drawAlarmConfiguration(int x=4, int y=0) {
     drawClock();
     
     lcd.setCursor(x, y);
     lcd.print("Set alarm:");
+
+    lcd.setCursor(x, y+1);
+    for (int i = 0; i < 6; i++) {
+        lcd.print(alarmTime[i]);
+        
+        if (i == 1 || i == 3) { 
+            lcd.print(":"); 
+        }
+    }
 }
 
 /* Initializes the custom LCD characters. 
@@ -104,6 +116,8 @@ void setup() {
     digitalWrite(PIN_BL, HIGH); 
     
     rtc.begin();
+
+    Serial.begin(9600);
 }
 
 void loop() {
@@ -117,5 +131,6 @@ void loop() {
             if (readButtonPress() == 5) { switchToMenu(0); }
             break;
     }
+
 }
 
