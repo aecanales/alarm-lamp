@@ -144,34 +144,22 @@ void loop() {
             drawMenu();
             if (readButtonPress() == 's') { switchToMenu(1); }
             break;
+        
         case 1:
-            switch (readButtonPress()) {
-                case 'r':
-                    currentDigit = wrapValue(currentDigit + 1, 0, 5);
-                    drawAlarmConfiguration(); // I wish there was a multiple case statement so i wouldn¿t have to repeat this line
-                    delay(1000);
-                    break;
-                case 'l':
-                    currentDigit = wrapValue(currentDigit - 1, 0, 5);
-                    drawAlarmConfiguration();
-                    delay(1000);
-                    break;
-                case 'u':
-                    alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, 9);
-                    drawAlarmConfiguration();
-                    delay(1000);
-                    break;
-                case 'd':
-                    alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, 9);
-                    drawAlarmConfiguration();
-                    delay(1000);
-                    break;
-                case 's':
-                    switchToMenu(0);
-                    break;
+            char button = readButtonPress();
+
+            if (button == 's') { switchToMenu(0); }
+            
+            if (button == 'r' || button == 'l' || button == 'u' || button == 'd') {
+                if      (button == 'r') { currentDigit = wrapValue(currentDigit + 1, 0, 5); }
+                else if (button == 'l') { currentDigit = wrapValue(currentDigit - 1, 0, 5); }
+                else if (button == 'u') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, 9); }
+                else if (button == 'd') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, 9); }
+                
+                drawAlarmConfiguration();
+                delay(1000);                
             }
             break;
     }
-
 }
 
