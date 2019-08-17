@@ -22,7 +22,6 @@ int currentDigit = 0;  // Digit the user is currently setting.
 // Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
 int menuState = 0;
 
-
 // Draws the 6 character clock icon at a specified (x, y) position.
 void drawClock(int x=0, int y=0) {
     for (int j = 0; j < 2; j++) {
@@ -149,22 +148,26 @@ void loop() {
             switch (readButtonPress()) {
                 case 'r':
                     currentDigit = wrapValue(currentDigit + 1, 0, 5);
-                    drawAlarmConfiguration();
+                    drawAlarmConfiguration(); // I wish there was a multiple case statement so i wouldn¿t have to repeat this line
+                    delay(1000);
                     break;
                 case 'l':
-                    currentDigit = wrapValue(currentDigit + 1, 0, 5);
+                    currentDigit = wrapValue(currentDigit - 1, 0, 5);
                     drawAlarmConfiguration();
+                    delay(1000);
                     break;
                 case 'u':
                     alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, 9);
                     drawAlarmConfiguration();
+                    delay(1000);
                     break;
                 case 'd':
                     alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, 9);
                     drawAlarmConfiguration();
+                    delay(1000);
                     break;
                 case 's':
-                    switchToMenu(1);
+                    switchToMenu(0);
                     break;
             }
             break;
