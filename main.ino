@@ -22,6 +22,9 @@ int currentDigit = 0;  // Digit the user is currently setting.
 // Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
 int menuState = 0;
 
+// Delay in milliseconds after a button press is detected to avoid multiple press detections.
+const int RELEASE_TIME = 750;
+
 // Draws the 6 character clock icon at a specified (x, y) position.
 void drawClock(int x=0, int y=0) {
     for (int j = 0; j < 2; j++) {
@@ -105,7 +108,7 @@ char readButtonPress() {
 // Switches to another menu.
 void switchToMenu(int newMenu) {
     lcd.clear();
-    delay(1000);  // Time to allow the user to let go of the button.
+    delay(RELEASE_TIME);
 
     menuState = newMenu;
     if (menuState == 1) {
@@ -157,7 +160,7 @@ void loop() {
                 else if (button == 'd') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, 9); }
                 
                 drawAlarmConfiguration();
-                delay(1000);                
+                delay(RELEASE_TIME);                
             }
             break;
     }
