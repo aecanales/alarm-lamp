@@ -17,7 +17,8 @@ DS3231  rtc(A4, A5);
 
 // Each value (hour, minute and second) are represented by their two digits for easier input.
 int alarmTime[6];
-int currentDigit = 0;  // Digit the user is currently setting. 
+int alarmTimeMax[] = {2, 9, 5, 9, 5, 9};  // Max value the digit can reach before wrapping.
+int currentDigit = 0;  // Digit the user is currently setting in the menu. 
 
 // Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
 int menuState = 0;
@@ -163,8 +164,8 @@ void loop() {
             if (button == 'r' || button == 'l' || button == 'u' || button == 'd') {
                 if      (button == 'r') { currentDigit = wrapValue(currentDigit + 1, 0, 5); }
                 else if (button == 'l') { currentDigit = wrapValue(currentDigit - 1, 0, 5); }
-                else if (button == 'u') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, 9); }
-                else if (button == 'd') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, 9); }
+                else if (button == 'u') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, alarmTimeMax[currentDigit]); }
+                else if (button == 'd') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, alarmTimeMax[currentDigit]); }
                 
                 drawAlarmConfiguration();
                 delay(RELEASE_TIME);                
