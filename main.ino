@@ -50,7 +50,13 @@ void drawSetAlarm(int x=5, int y=1) {
     lcd.write(7);
 
     lcd.setCursor(x+2, y+1);
-    lcd.print("OFF");
+    for (int i = 0; i < 6; i++) {
+        lcd.print(alarmTime[i]);
+        
+        if (i == 1 || i == 3) { 
+            lcd.print(":"); 
+        }
+    }
 }
 
 // Draws the main menu including clock icon, current time, and alamt set time.
@@ -61,22 +67,23 @@ void drawMenu() {
 }
 
 // Draws menu where you can set the alarm.
-void drawAlarmConfiguration(int x=4, int y=0) {
+void drawAlarmConfiguration(int x=5, int y=0) {
     drawClock();
     
     lcd.setCursor(x, y);
-    lcd.print("Set alarm:");
+    lcd.print("Set alarm.");
 
-    lcd.setCursor(x, y+1);
-    for (int i = 0; i < 6; i++) {
-        lcd.print(alarmTime[i]);
-        
-        if (i == 1 || i == 3) { 
-            lcd.print(":"); 
-        }
-    }
+    drawSetAlarm(x, y+1);
 
-    lcd.setCursor(x+currentDigit, y+1);
+    lcd.setCursor(x+setAlarmDX(), y+1);
+}
+
+// Returns the dx  of where the cursor should be depending on the currently selected digit. 
+int setAlarmDX() {
+    int dx = 2 + currentDigit;  // 2 to move from the bell icon to the first digit. 
+    if      (currentDigit > 3) { dx += 2; }  // Skipping two ":".
+    else if (currentDigit > 1) { dx += 1; }  // Skipping one ":".
+    return dx;
 }
 
 /* Initializes the custom LCD characters. 
