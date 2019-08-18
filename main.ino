@@ -11,6 +11,8 @@ const int PIN_D7 = 7;
 
 const int PIN_BL = 10;  // Backlight pin.
 
+const int LED_PIN = 2;
+
 LiquidCrystal lcd(PIN_RS,  PIN_EN,  PIN_D4,  PIN_D5,  PIN_D6,  PIN_D7);
 
 DS3231  rtc(A4, A5);
@@ -19,6 +21,8 @@ DS3231  rtc(A4, A5);
 int alarmTime[6];
 int alarmTimeMax[] = {2, 9, 5, 9, 5, 9};  // Max value the digit can reach before wrapping.
 int currentDigit = 0;  // Digit the user is currently setting in the menu. 
+
+bool alarmHasActivated = false;
 
 // Tracks current menu. 0 is the main menu, 1 is the alarm setting menu.
 int menuState = 0;
@@ -138,13 +142,29 @@ int wrapValue(int value, int min, int max) {
     else                  { return value; }
 }
 
+// Returns true when it is the alarm time and the alarm hasn't activated yet.
+bool runAlarm() {
+    if (!alarmHasActivated) {
+        Time t = rtc.getTime();
+        
+        if (t.hour == alarmTime[0] * 10 + alarmTime[1] &&
+            t.min  == alarmTime[2] * 10 + alarmTime[3] &&
+            t.sec  == alarmTime[4] * 10 + alarmTime[5]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void setup() {
     lcd.begin(16, 2);
     createCharacters();
 
-    // Initialize the LCD backlight to ON. 
-    pinMode(PIN_BL, OUTPUT);
-    digitalWrite(PIN_BL, HIGH); 
+    pinMode(PIN_BL,  OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
+
+    digitalWrite(PIN_BL, HIGH);  // Initialize the LCD backlight to ON. 
     
     rtc.begin();
 }
@@ -153,7 +173,14 @@ void loop() {
     switch (menuState) {
         case 0:
             drawMenu();
+            
             if (readButtonPress() == 's') { switchToMenu(1); }
+            
+            if (runAlarm()) {
+                digitalWrite(LED_PIN, HIGH);
+                alarmHasActivated = true;
+            }
+
             break;
         
         case 1:
