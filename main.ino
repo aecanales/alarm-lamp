@@ -168,6 +168,11 @@ void setup() {
     digitalWrite(RELAY_PIN, HIGH);  // Since the lamp is connected to NO, this turns it off. 
     
     rtc.begin();
+    
+    // The following lines can be uncommented to set the date and time.
+    // rtc.setDOW(TUESDAY);        // Set day of week
+    // rtc.setTime(22, 44, 30);    // Set the time (24hr format)
+    // rtc.setDate(8, 27, 2019);   // Set the date (MM/DD/YYYY)
 }
 
 void loop() {
