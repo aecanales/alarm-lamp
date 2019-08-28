@@ -11,7 +11,7 @@ const int PIN_D7 = 7;
 
 const int PIN_BL = 10;  // Backlight pin.
 
-const int LED_PIN = 2;
+const int RELAY_PIN = 2;
 
 LiquidCrystal lcd(PIN_RS,  PIN_EN,  PIN_D4,  PIN_D5,  PIN_D6,  PIN_D7);
 
@@ -162,9 +162,10 @@ void setup() {
     createCharacters();
 
     pinMode(PIN_BL,  OUTPUT);
-    pinMode(LED_PIN, OUTPUT);
+    pinMode(RELAY_PIN, OUTPUT);
 
-    digitalWrite(PIN_BL, HIGH);  // Initialize the LCD backlight to ON. 
+    digitalWrite(PIN_BL, HIGH);     // Initialize the LCD backlight to ON. 
+    digitalWrite(RELAY_PIN, HIGH);  // Since the lamp is connected to NO, this turns it off. 
     
     rtc.begin();
 }
@@ -177,7 +178,7 @@ void loop() {
             if (readButtonPress() == 's') { switchToMenu(1); }
             
             if (runAlarm()) {
-                digitalWrite(LED_PIN, HIGH);
+                digitalWrite(RELAY_PIN, LOW);
                 alarmHasActivated = true;
             }
 
