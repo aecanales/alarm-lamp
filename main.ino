@@ -28,7 +28,11 @@ bool alarmHasActivated = false;
 int menuState = 0;
 
 // Delay in milliseconds after a button press is detected to avoid multiple press detections.
-const int RELEASE_TIME = 750;
+const int RELEASE_TIME = 550;
+
+const unsigned long COOLDOWN = 10 * 1000;  // Time in milliseconds until the LCD shuts off.
+unsigned long lastActionMillis = 0;   // Last millis at which the user performed an action.
+
 
 // Draws the 6 character clock icon at a specified (x, y) position.
 void drawClock(int x=0, int y=0) {
@@ -157,6 +161,12 @@ bool runAlarm() {
     return false;
 }
 
+// Wakes screen if off and updates the cooldown timer.
+void wakeScreen() {
+    lastActionMillis = millis();
+    digitalWrite(PIN_BL, HIGH);
+}
+
 void setup() {
     lcd.begin(16, 2);
     createCharacters();
@@ -180,19 +190,27 @@ void loop() {
         case 0:
             drawMenu();
             
-            if (readButtonPress() == 's') { switchToMenu(1); }
+            if (readButtonPress() == 's') { 
+                wakeScreen();
+                switchToMenu(1); 
+            }
             
             if (runAlarm()) {
                 digitalWrite(RELAY_PIN, LOW);
                 alarmHasActivated = true;
             }
 
+            if (millis() > lastActionMillis + COOLDOWN) { digitalWrite(PIN_BL, LOW); }
+
             break;
         
         case 1:
             char button = readButtonPress();
 
-            if (button == 's') { switchToMenu(0); }
+            if (button == 's') { 
+                wakeScreen();
+                switchToMenu(0);
+            }
             
             if (button == 'r' || button == 'l' || button == 'u' || button == 'd') {
                 if      (button == 'r') { currentDigit = wrapValue(currentDigit + 1, 0, 5); }
@@ -200,9 +218,12 @@ void loop() {
                 else if (button == 'u') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] + 1, 0, alarmTimeMax[currentDigit]); }
                 else if (button == 'd') { alarmTime[currentDigit] = wrapValue(alarmTime[currentDigit] - 1, 0, alarmTimeMax[currentDigit]); }
                 
+                wakeScreen();
                 drawAlarmConfiguration();
                 delay(RELEASE_TIME);                
             }
+
+            if (millis() > lastActionMillis + COOLDOWN) { digitalWrite(PIN_BL, LOW); }
             break;
     }
 }
