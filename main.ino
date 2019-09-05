@@ -1,5 +1,6 @@
-#include <LiquidCrystal.h>
 #include <DS3231.h>
+#include <EEPROM.h>
+#include <LiquidCrystal.h>
 
 const int PIN_RS = 8; 
 const int PIN_EN = 9; 
@@ -133,6 +134,7 @@ void switchToMenu(int newMenu) {
     } 
     else {
         lcd.noCursor();
+        saveAlarmToEEPROM();
     }
 }
 
@@ -144,6 +146,20 @@ int wrapValue(int value, int min, int max) {
     if      (value > max) { return min;   }
     else if (value < min) { return max;   }
     else                  { return value; }
+}
+
+// Saves the set alarm to the first 6 adresses in EEPROM memory.
+void saveAlarmToEEPROM() {
+    for (int i = 0; i < 6; i++) {
+        EEPROM.write(i, alarmTime[i]);
+    }
+}
+
+// Loads the values in the first 6 adresses in EEPROM memory to alarmTime[].
+void loadAlarmFromEEPROM() {
+    for (int i = 0; i < 6; i++) {
+        alarmTime[i] = EEPROM.read(i);
+    }
 }
 
 // Returns true when it is the alarm time and the alarm hasn't activated yet.
@@ -178,6 +194,10 @@ void setup() {
     digitalWrite(RELAY_PIN, HIGH);  // Since the lamp is connected to NO, this turns it off. 
     
     rtc.begin();
+    
+    /* Uncomment this line after your first time setting the alarm, or else you'll get
+       a random sequences of values depending on whatever you have stored on your EEPROM. */
+    // loadAlarmFromEEPROM();
     
     // The following lines can be uncommented to set the date and time.
     // rtc.setDOW(TUESDAY);        // Set day of week
