@@ -24,7 +24,9 @@ Requires the [DS3231 library](http://www.rinkydinkelectronics.com/library.php?id
 
 ### Hook-up
 
-The shield is hooked up to the default digital pins, but adjust them if you're using a different model. The relay is connected to ``D2`` and the RTC module is connected via I²C to ``A4 (SDA)`` and ``A5 (SCL)``. Both are connected to 5V and GND.  
+The shield is hooked up to the default digital pins, but adjust them if you're using a different model. The relay's signal pin is connected to ``D2`` and the RTC module is connected via I²C to ``A4 (SDA)`` and ``A5 (SCL)``. Both are connected to 5V and GND.  
+
+The relay is connected to the lamp via C and NO. If you have never worked with a relay before and not sure what that means, refer to [this image.](http://www.circuitbasics.com/wp-content/uploads/2015/11/Arduino-Temperature-Dependent-Light-Bulb-With-5V-Relay-Updated.png) Please be careful when working with main voltage!
 
 ## Usage
 
@@ -32,11 +34,19 @@ The ``setup()`` function has some commented-out lines to set the RTC time.  A li
 
 Once uploaded, the LCD defaults to a screen that shows the current time and set alarm time. By pressing ``select`` on the keypad, you will switch to the alarm setting screen, from where you can set the alarm time using the directional buttons. Press ``select`` again to save the alarm time and return to the inital screen.
 
+After the alarm time is reached, the lamp will turn on and stay on! To turn it off, you'll have to hit the reset button on the Arduino.
+
 ## Files
 
 ``main.ino`` contains the majority of the logic. ``characters.ino`` contains the definitions for the custom characters used on the LCD screen, and ``designs.pdn`` is a Paint.NET file where I designed the characters before writing them as byte arrays.
 
-In the future, I'd love to break the alarm logic into its own class/file, but at least for now it works!
+## Roadmap
+
+*(AKA stuff I'd love to do, but no idea if I'll actually do)*
+
+* It'd be great to break the alarm logic into its own class/file to reduce the clutter in ``main.ino``
+* The input code is pretty much a hack (it avoids detecting multiple presses via a delay between each reading) so I'd love to implement a library to read input properly or maybe write my own
+* It'd be interesting to switch the lamp for an RGB LED that turns on gradually (emulating a sun rise or something like that)
 
 
 
